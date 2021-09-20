@@ -1,20 +1,13 @@
-import math
+# imports
 import tkinter as tk
 import time
 import random
-
-
 import individual as p
-import numpy as np
-import matplotlib.pyplot as plt
-# variable attributes
-import self as self
 
+# main variables
 individuals = []
 infected_individuals = []
 number_of_individuals = 250
-passes = 0
-FPS = 50
 num_sus = 250
 num_infec = 1
 num_dec = 0
@@ -55,24 +48,25 @@ def simulator():
         individuals.append(person)
 
     def infect_others(k):
-        global num_sus, start
-        global num_infec
-        r = individuals[k].infection_radius
-        c = individuals[k].c.coords(individuals[k].image)
-        x_i = c[0] + r
-        y_i = c[1] + r
-        if random.randint(1, 100) <= 5:
-            for x in range(0, len(individuals)):
-                ind = individuals[x]
-                c = ind.c.coords(ind.image)
-                temp_x = c[0]
-                temp_y = c[1]
-                if abs((x_i - temp_x)) <= r and abs((y_i - temp_y)) <= r and ind.infected == False:
-                    ind.infect()
-                    num_infec += 1
-                    num_sus -= 1
-                    ind.infected = True
-                    infected_individuals.append(ind)
+        if not individuals[k].deceased:
+            global num_sus, start
+            global num_infec
+            r = individuals[k].infection_radius
+            c = individuals[k].c.coords(individuals[k].image)
+            x_i = c[0] + r
+            y_i = c[1] + r
+            if random.randint(1, 100) <= 5:
+                for x in range(0, len(individuals)):
+                    ind = individuals[x]
+                    c = ind.c.coords(ind.image)
+                    temp_x = c[0]
+                    temp_y = c[1]
+                    if abs((x_i - temp_x)) <= r and abs((y_i - temp_y)) <= r and ind.infected == False:
+                        ind.infect()
+                        num_infec += 1
+                        num_sus -= 1
+                        ind.infected = True
+                        infected_individuals.append(ind)
 
     finish = True
     while finish:
@@ -86,6 +80,7 @@ def simulator():
                     canvas.itemconfig(individuals[i].image, fill="grey")
                     canvas.itemconfig(individuals[i].radius_image, outline="")
                     num_dec += 1
+                    individuals[i].deceased = True
                 else:
                     individuals[i].radius_animation()
                     infect_others(i)
