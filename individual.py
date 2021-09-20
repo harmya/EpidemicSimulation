@@ -1,13 +1,12 @@
 import random
 import math
+import time
 
 speed = 1
 
 
 class Individual:
     def __init__(self, c, x, y, r, w):
-        self.x = x
-        self.y = y
         self.c = c
         self.r = r
         self.x0 = x - r
@@ -25,6 +24,7 @@ class Individual:
         self.infected = False
         self.susceptible = True
         self.deceased = False
+        self.quarantined = False
         self.image = ()
         self.radius_image = ()
         self.sentinal = 1
@@ -46,9 +46,9 @@ class Individual:
     def infect(self):
         self.c.itemconfig(self.image, fill="red")
         self.infected = True
+        self.time_of_infection = time.time()
 
     def radius_animation(self):
-
         self.c.itemconfig(self.radius_image, outline="")
         c = self.c.coords(self.image)
         f = 0.3
@@ -56,7 +56,6 @@ class Individual:
         y0 = c[1] - (f * self.sentinal)
         x1 = c[2] + (f * self.sentinal)
         y1 = c[3] + (f * self.sentinal)
-
         if (x1 - x0) / 2 >= self.infection_radius:
             x0 = c[0]
             y0 = c[1]
@@ -67,17 +66,41 @@ class Individual:
         self.radius_image = self.c.create_oval(x0, y0, x1, y1, outline="red")
 
     def move_individual(self):
+        if self.quarantined:
+
+            coordinates = self.c.coords(self.image)
+            if coordinates[2] >= 700:
+                self.create_vector(-1, 0, -1, 1)
+
+            if coordinates[0] <= 500:
+                self.create_vector(0, 1, -1, 1)
+
+            if coordinates[3] >= 300:
+                self.create_vector(-1, 1, -1, 0)
+
+            if coordinates[1] <= 100:
+                self.create_vector(-1, 1, 0, 1)
+            self.c.move(self.image, self.x_vector, self.y_vector)
+
+        else:
+            coordinates = self.c.coords(self.image)
+            if coordinates[2] >= 400:
+                self.create_vector(-1, 0, -1, 1)
+
+            if coordinates[0] <= 9:
+                self.create_vector(0, 1, -1, 1)
+
+            if coordinates[3] >= 400:
+                self.create_vector(-1, 1, -1, 0)
+
+            if coordinates[1] <= 9:
+                self.create_vector(-1, 1, 0, 1)
+
+            self.c.move(self.image, self.x_vector, self.y_vector)
+
+    def quarantine(self):
+        self.quarantined = True
         coordinates = self.c.coords(self.image)
-        if coordinates[2] >= 400:
-            self.create_vector(-1, 0, -1, 1)
-
-        if coordinates[0] <= 9:
-            self.create_vector(0, 1, -1, 1)
-
-        if coordinates[3] >= 400:
-            self.create_vector(-1, 1, -1, 0)
-
-        if coordinates[1] <= 9:
-            self.create_vector(-1, 1, 0, 1)
-
-        self.c.move(self.image, self.x_vector, self.y_vector)
+        x = coordinates[0] + self.r
+        y = coordinates[1] + self.r
+        self.c.move(self.image, 600 - x, 200 - y)

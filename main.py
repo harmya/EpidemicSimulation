@@ -2,6 +2,8 @@ import math
 import tkinter as tk
 import time
 import random
+
+
 import individual as p
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,6 +19,7 @@ num_sus = 250
 num_infec = 1
 num_dec = 0
 start = time.time() + 100000
+quarantine = False
 
 
 def simulator():
@@ -27,6 +30,14 @@ def simulator():
     canvas.create_line(9, 9, 402, 9, fill='white')
     canvas.create_line(402, 9, 402, 402, fill='white')
     canvas.create_line(9, 402, 402, 402, fill='white')
+    # quarantine box
+    if quarantine:
+        canvas.create_line(500, 100, 500, 300, fill='white')
+        canvas.create_line(500, 100, 700, 100, fill='white')
+        canvas.create_line(500, 300, 700, 300, fill='white')
+        canvas.create_line(700, 300, 700, 100, fill='white')
+        canvas.create_text(608, 320, text='Quarantine', fill="white", font=('Helvetica 15'))
+
     canvas.pack(fill=tk.BOTH, expand=True)
 
     def clicker():
@@ -61,30 +72,27 @@ def simulator():
                     num_infec += 1
                     num_sus -= 1
                     ind.infected = True
-                    ind.time_of_infection = time.time()
                     infected_individuals.append(ind)
 
     finish = True
     while finish:
         global num_dec
         for i in range(0, len(individuals)):
-            if individuals[i].susceptible:
-                individuals[i].move_individual()
-                if individuals[i].infected:
-                    if (time.time() - individuals[i].time_of_infection) >= 10 and len(infected_individuals) > 0:
-                        canvas.itemconfig(individuals[i].image, fill="grey")
-                        canvas.itemconfig(individuals[i].radius_image, outline="")
-                        num_dec += 1
-                    else:
-                        individuals[i].radius_animation()
-                        infect_others(i)
+            individuals[i].move_individual()
+            if individuals[i].infected:
+                if (quarantine and time.time() - individuals[i].time_of_infection) >= 1 and individuals[i].quarantined == False:
+                    individuals[i].quarantine()
+                if (time.time() - individuals[i].time_of_infection) >= 4:
+                    canvas.itemconfig(individuals[i].image, fill="grey")
+                    canvas.itemconfig(individuals[i].radius_image, outline="")
+                    num_dec += 1
+                else:
+                    individuals[i].radius_animation()
+                    infect_others(i)
 
-        if num_infec == 10:
+        if num_infec == 20:
             global start
             start = time.time()
-
-        # if num_sus < 10:
-        # finish = False
         window.update()
     print(num_sus)
     print(num_infec)
