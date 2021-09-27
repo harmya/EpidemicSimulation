@@ -4,7 +4,6 @@ import time
 
 speed = 0.8
 
-
 class Individual:
     def __init__(self, c, x, y, r, w):
         self.c = c
