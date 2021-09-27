@@ -2,7 +2,7 @@ import random
 import math
 import time
 
-speed = 1
+speed = 0.8
 
 
 class Individual:
@@ -29,6 +29,9 @@ class Individual:
         self.radius_image = ()
         self.sentinal = 1
         self.time_of_infection = 0
+        self.can_infect = False
+        self.is_social_distancing = False
+        self.community_number = 0
 
     def create_vector(self, x_low, x_high, y_low, y_high):
         x_v = random.uniform(x_low, x_high)
@@ -46,6 +49,7 @@ class Individual:
     def infect(self):
         self.c.itemconfig(self.image, fill="red")
         self.infected = True
+        self.can_infect = True
         self.time_of_infection = time.time()
 
     def radius_animation(self):
@@ -67,7 +71,6 @@ class Individual:
 
     def move_individual(self):
         if self.quarantined:
-
             coordinates = self.c.coords(self.image)
             if coordinates[2] >= 700:
                 self.create_vector(-1, 0, -1, 1)
@@ -103,4 +106,33 @@ class Individual:
         coordinates = self.c.coords(self.image)
         x = coordinates[0] + self.r
         y = coordinates[1] + self.r
-        self.c.move(self.image, 600 - x, 200 - y)
+        self.c.move(self.image, (600 - x), (200 - y))
+
+    def move_individual_communities(self):
+        coordinates = self.c.coords(self.image)
+        j = 0
+        i = self.community_number
+        if self.community_number >= 4:
+            i = self.community_number - 3
+            j = 1
+
+        if coordinates[2] >= (302 * i):
+            self.create_vector(-1, 0, -1, 1)
+
+        if coordinates[0] <= 15 + (310 * (i - 1)):
+            self.create_vector(0, 1, -1, 1)
+
+        if coordinates[3] >= 302 + (j * 308):
+            self.create_vector(-1, 1, -1, 0)
+
+        if coordinates[1] <= 15 + (j * 310):
+            self.create_vector(-1, 1, 0, 1)
+
+        self.c.move(self.image, self.x_vector, self.y_vector)
+
+    def travel_to_another(self):
+        to_community = random.randint(1, 6)
+        centers = [ []]
+        x_d = self.create_vector()
+
+
