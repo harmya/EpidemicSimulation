@@ -2,24 +2,31 @@
 import tkinter as tk
 import time
 import random
+from itertools import count
+
+import numpy as np
+from pandas import DataFrame
+from matplotlib import pyplot as plt, animation
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.animation import FuncAnimation
 import individual as p
 from tkmacosx import Button
 
 # main variables
 individuals = []
 infected_individuals = []
-number_of_individuals = 250
+number_of_individuals = 200
 number_of_individuals_in_community = 100
-num_sus = 250
-num_infec = 1
-num_dec = 0
 start = time.time() + 100000
-quarantine = False
-communities = True
-normal = False
+quarantine = True
+communities = False
+normal = True
 
 
 def simulator():
+    num_sus = number_of_individuals
+    num_infec = 0
+    num_dec = 0
     window = tk.Tk()
     window.attributes('-fullscreen', True)
     canvas = tk.Canvas(window, bg='black')
@@ -95,60 +102,65 @@ def simulator():
         individuals[temp].can_infect = True
         infected_individuals.append(individuals[temp])
         individuals[temp].time_of_infection = time.time()
+        nonlocal num_infec
+        num_infec += 1
+        nonlocal num_sus
+        num_sus -= 1
 
     infect_button = Button(window, borderwidth=3.5, text='Start Infection', command=clicker, bg='white', fg='red')
     infect_button.place(x=100, y=735)
 
     def infect_others(k):
-        if not individuals[k].deceased:
-            global num_sus, start
-            global num_infec
-            r = individuals[k].infection_radius
-            c = individuals[k].c.coords(individuals[k].image)
-            x_i = c[0] + r
-            y_i = c[1] + r
-            if random.randint(1, 100) <= 5:
-                for x in range(0, len(individuals)):
-                    ind = individuals[x]
-                    c = ind.c.coords(ind.image)
-                    temp_x = c[0]
-                    temp_y = c[1]
-                    if abs((x_i - temp_x)) <= r and abs((y_i - temp_y)) <= r and ind.infected == False:
-                        ind.infect()
-                        num_infec += 1
-                        num_sus -= 1
-                        ind.infected = True
-                        ind.can_infect = True
-                        infected_individuals.append(ind)
+        nonlocal num_infec
+        nonlocal num_sus
+        r = individuals[k].infection_radius
+        c = individuals[k].c.coords(individuals[k].image)
+        x_i = c[0] + r
+        y_i = c[1] + r
+        if random.randint(1, 101) <= 5:
+            for x in range(0, len(individuals)):
+                ind = individuals[x]
+                c = ind.c.coords(ind.image)
+                temp_x = c[0]
+                temp_y = c[1]
+                if abs((x_i - temp_x)) <= r and abs(
+                        (y_i - temp_y)) <= r and ind.infected == False and ind.deceased == False:
+                    ind.infect()
+                    num_infec += 1
+                    num_sus -= 1
+                    ind.infected = True
+                    ind.can_infect = True
+                    infected_individuals.append(ind)
 
     finish = True
     while finish:
-        global num_dec
         for i in range(0, len(individuals)):
-            individuals[i].move_individual_communities()
+            if communities and individuals[i].mov_com == False:
+                individuals[i].move_individual_communities()
+            else:
+                individuals[i].move_individual()
             if individuals[i].infected:
-                if (quarantine and time.time() - individuals[i].time_of_infection) >= 2 and individuals[i].quarantined == False:
+                if (quarantine and time.time() - individuals[i].time_of_infection) >= 1 and individuals[
+                    i].quarantined == False:
                     individuals[i].quarantine()
-                if (time.time() - individuals[i].time_of_infection) >= 5:
+                if (time.time() - individuals[i].time_of_infection) >= 5 and individuals[i].deceased == False:
                     canvas.itemconfig(individuals[i].image, fill="grey")
                     canvas.itemconfig(individuals[i].radius_image, outline="")
                     num_dec += 1
+                    num_infec -= 1
                     individuals[i].deceased = True
                     individuals[i].can_infect = False
                     individuals[i].infected = False
                 if individuals[i].infected:
                     individuals[i].radius_animation()
-                if not individuals[i].quarantined and not individuals[i].deceased:
+                if not individuals[i].quarantined and individuals[i].can_infect:
                     infect_others(i)
-
-        if num_infec == 50:
-            global start
-            start = time.time()
+        # if random.randint(0, 100) <= 20:
+        # individuals[random.randint(0, 599)].mov_com = True
+        if num_infec == 0 and num_sus != number_of_individuals:
+            finish = False
         window.update()
-    print(num_sus)
-    print(num_infec)
     tk.mainloop()
 
 
 simulator()
-

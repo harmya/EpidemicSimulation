@@ -2,7 +2,8 @@ import random
 import math
 import time
 
-speed = 0.8
+speed = 0.5
+
 
 class Individual:
     def __init__(self, c, x, y, r, w):
@@ -31,6 +32,10 @@ class Individual:
         self.can_infect = False
         self.is_social_distancing = False
         self.community_number = 0
+        self.reached_quarantine = False
+        self.reached_community = False
+        self.mov_com = False
+        self.toCom = 0
 
     def create_vector(self, x_low, x_high, y_low, y_high):
         x_v = random.uniform(x_low, x_high)
@@ -71,18 +76,27 @@ class Individual:
     def move_individual(self):
         if self.quarantined:
             coordinates = self.c.coords(self.image)
-            if coordinates[2] >= 700:
-                self.create_vector(-1, 0, -1, 1)
+            x = coordinates[0] + self.r
+            y = coordinates[1] + self.r
+            if not self.reached_quarantine:
+                if x >= 592 and y >= 192:
+                    self.reached_quarantine = True
+                    self.c.move(self.image, random.randint(-10, 10), random.randint(-10, 10))
+                else:
+                    self.c.move(self.image, (600 - x) / 10, (200 - y) / 10)
+            else:
+                if coordinates[2] >= 700:
+                    self.create_vector(-1, 0, -1, 1)
 
-            if coordinates[0] <= 500:
-                self.create_vector(0, 1, -1, 1)
+                if coordinates[0] <= 500:
+                    self.create_vector(0, 1, -1, 1)
 
-            if coordinates[3] >= 300:
-                self.create_vector(-1, 1, -1, 0)
+                if coordinates[3] >= 300:
+                    self.create_vector(-1, 1, -1, 0)
 
-            if coordinates[1] <= 100:
-                self.create_vector(-1, 1, 0, 1)
-            self.c.move(self.image, self.x_vector, self.y_vector)
+                if coordinates[1] <= 100:
+                    self.create_vector(-1, 1, 0, 1)
+                self.c.move(self.image, self.x_vector, self.y_vector)
 
         else:
             coordinates = self.c.coords(self.image)
@@ -102,36 +116,63 @@ class Individual:
 
     def quarantine(self):
         self.quarantined = True
-        coordinates = self.c.coords(self.image)
-        x = coordinates[0] + self.r
-        y = coordinates[1] + self.r
-        self.c.move(self.image, (600 - x), (200 - y))
 
     def move_individual_communities(self):
-        coordinates = self.c.coords(self.image)
-        j = 0
-        i = self.community_number
-        if self.community_number >= 4:
-            i = self.community_number - 3
-            j = 1
+        if self.mov_com:
+            c = random.randint(0, 6)
+            centers = [[150, 150], [350, 150], [550, 150], [150, 350, ], [350, 350], [550, 350]]
+            coordinates = self.c.coords(self.image)
+            x = coordinates[0] + self.r
+            y = coordinates[1] + self.r
+            if not self.reached_community:
+                if x >= centers[c][0] - 5 and y >= centers[c][1] - 5:
+                    self.reached_community = True
+                    self.c.move(self.image, random.randint(-10, 10), random.randint(-10, 10))
+                else:
+                    self.c.move(self.image, (centers[self.community_number][0] - x),
+                                (centers[self.community_number][1] - y))
 
-        if coordinates[2] >= (302 * i):
-            self.create_vector(-1, 0, -1, 1)
+        if self.quarantined:
+            coordinates = self.c.coords(self.image)
+            x = coordinates[0] + self.r
+            y = coordinates[1] + self.r
+            if not self.reached_quarantine:
+                if x >= 464 and y >= 744:
+                    self.reached_quarantine = True
+                    self.c.move(self.image, random.randint(-10, 10), random.randint(-10, 10))
+                else:
+                    self.c.move(self.image, (468 - x) / 10, (750 - y) / 10)
+            else:
+                if coordinates[2] >= 568:
+                    self.create_vector(-1, 0, -1, 1)
 
-        if coordinates[0] <= 15 + (310 * (i - 1)):
-            self.create_vector(0, 1, -1, 1)
+                if coordinates[0] <= 376:
+                    self.create_vector(0, 1, -1, 1)
 
-        if coordinates[3] >= 302 + (j * 308):
-            self.create_vector(-1, 1, -1, 0)
+                if coordinates[3] >= 840:
+                    self.create_vector(-1, 1, -1, 0)
 
-        if coordinates[1] <= 15 + (j * 310):
-            self.create_vector(-1, 1, 0, 1)
+                if coordinates[1] <= 660:
+                    self.create_vector(-1, 1, 0, 1)
+                self.c.move(self.image, self.x_vector, self.y_vector)
+        else:
+            coordinates = self.c.coords(self.image)
+            j = 0
+            i = self.community_number
+            if self.community_number >= 4:
+                i = self.community_number - 3
+                j = 1
 
-        self.c.move(self.image, self.x_vector, self.y_vector)
+            if coordinates[2] >= (302 * i):
+                self.create_vector(-1, 0, -1, 1)
 
-    def travel_to_another(self):
-        to_community = random.randint(1, 6)
-        centers = [ []]
-        x_d = self.create_vector()
+            if coordinates[0] <= 15 + (310 * (i - 1)):
+                self.create_vector(0, 1, -1, 1)
 
+            if coordinates[3] >= 302 + (j * 308):
+                self.create_vector(-1, 1, -1, 0)
 
+            if coordinates[1] <= 15 + (j * 310):
+                self.create_vector(-1, 1, 0, 1)
+
+            self.c.move(self.image, self.x_vector, self.y_vector)
