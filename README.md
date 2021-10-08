@@ -20,7 +20,7 @@ Here is a representation of how the simulation works:
 ## Implementing quarantine
 - Now let us see the difference if we implement quarantine. 
 - Here, 1 second = 1 day. We will quarantine infected individuals after a day into a separate location.
-- We can clearly see that good quarantine practices can completely hault an epidemic.
+- We can clearly see that good quarantine practices can completely halt an epidemic.
 - The simulation goes as follows:
 
 Here is a representation of how the simulation works:
