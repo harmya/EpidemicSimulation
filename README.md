@@ -1,6 +1,6 @@
 # Epidemic Simulation
 
-The entire world is goign through a pandemic right now. This got thinking about how a particular infection or virus' pandemic comes to an end and what are the different variables whihch affect the infection.
+The entire world is going through a pandemic right now. This got me thinking about how a particular infection comes to an end and what are the different variables which affect the infection.
 
 ## Colour Code:
 - **Blue: Susceptible Individuals**
