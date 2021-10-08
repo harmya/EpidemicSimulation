@@ -3,9 +3,9 @@
 The entire world is goign through a pandemic right now. This got thinking about how a particular infection or virus' pandemic comes to an end and what are the different variables whihch affect the infection.
 
 **Colour Code:
-Blue: Susceptible Individuals
-Red: Currently Infected Individuals
-Grey: Removed Individuals (Deceased or Recovered)**
+- **Blue: Susceptible Individuals
+- **Red: Currently Infected Individuals
+- **Grey: Removed Individuals (Deceased or Recovered)**
 
 Overview:
 - We spawn random individuals and assign random 2D vectors which sets them to wander about in a random path.
