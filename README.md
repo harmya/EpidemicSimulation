@@ -24,5 +24,5 @@ Here is a representation of how the simulation works:
 
 Here is a representation of how the simulation works:
 <p align="center">
-  <img src="quaratine.gif" alt="animated" />
+  <img src="quarantine.gif" alt="animated" />
 </p>
