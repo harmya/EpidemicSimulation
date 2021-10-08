@@ -2,7 +2,7 @@
 
 The entire world is goign through a pandemic right now. This got thinking about how a particular infection or virus' pandemic comes to an end and what are the different variables whihch affect the infection.
 
-**Colour Code:
+## Colour Code:
 - **Blue: Susceptible Individuals**
 - **Red: Currently Infected Individuals**
 - **Grey: Removed Individuals (Deceased or Recovered)**
