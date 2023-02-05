@@ -1,6 +1,6 @@
 # Epidemic Simulation
 
-The entire world is going through a pandemic right now. This got me thinking about how a particular infection comes to an end and what are the different variables which affect the infection.
+The entire world is going through a pandemic right now. Normally, I tried to mathematically model it.
 
 ## Colour Code:
 - **Blue: Susceptible Individuals**
